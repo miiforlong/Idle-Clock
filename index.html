@@ -1,545 +1,333 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clock Screensaver.</title>
-    <link rel="icon" href="icon.ico" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Idle Screensaver Infinite</title>
 
-        body {
-            background: #000000;
-            overflow: hidden;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            cursor: none;
-            transition: background 0.5s ease;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
-        body.light-mode {
-            background: #ffffff;
-        }
+<style>
 
-        body.light-mode .time {
-            color: #000000;
-            text-shadow: 
-                0 0 10px rgba(0, 0, 0, 0.3),
-                0 0 20px rgba(0, 0, 0, 0.2);
-        }
+*{margin:0;padding:0;box-sizing:border-box;}
 
-        body.light-mode .date {
-            color: #333333;
-            text-shadow: 
-                0 0 5px rgba(51, 51, 51, 0.3);
-        }
+body{
+    background:#000;
+    overflow:hidden;
+    font-family:'Inter',sans-serif;
+    cursor:none;
+    transition:background 1s ease;
+}
 
-        body.light-mode .day {
-            color: #666666;
-            text-shadow: 
-                0 0 5px rgba(102, 102, 102, 0.3);
-        }
+@keyframes shake {
+    0%{transform:translate(0px,0px);}
+    25%{transform:translate(-2px,1px);}
+    50%{transform:translate(2px,-1px);}
+    75%{transform:translate(-1px,2px);}
+    100%{transform:translate(0px,0px);}
+}
 
-        body.light-mode .particle {
-            background: #000000;
-        }
+#screen{
+    width:100vw;
+    height:100vh;
+    position:relative;
+}
 
-        body.light-mode .controls button {
-            background: rgba(0, 0, 0, 0.1);
-            color: #000000;
-        }
+.container{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+}
 
-        body.light-mode .controls button:hover {
-            background: rgba(0, 0, 0, 0.2);
-        }
+.level{
+    font-size:14px;
+    letter-spacing:3px;
+    color:#aaa;
+    margin-bottom:5px;
+}
 
-        .container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            animation: float 6s ease-in-out infinite;
-        }
+.rebirth{
+    font-size:12px;
+    color:#555;
+    margin-bottom:5px;
+}
 
-        @keyframes float {
-            0%, 100% {
-                transform: translate(-50%, -50%) translateY(0);
-            }
-            50% {
-                transform: translate(-50%, -50%) translateY(-20px);
-            }
-        }
+.time{
+    font-size:110px;
+    color:#fff;
+    letter-spacing:8px;
+}
 
-        .time {
-            font-size: 120px;
-            font-weight: 800;
-            color: #ffffff;
-            text-shadow: 
-                0 0 10px rgba(255, 255, 255, 0.8),
-                0 0 20px rgba(255, 255, 255, 0.5);
-            letter-spacing: 10px;
-            margin-bottom: 20px;
-            font-variant-numeric: tabular-nums;
-            display: inline-flex;
-            align-items: center;
-        }
+.date{color:#aaa;font-size:22px;margin-top:10px;}
+.day{color:#666;font-size:14px;margin-top:5px;}
 
-        .ampm {
-            font-size: 40px;
-            opacity: 0.5;
-            font-weight: 400;
-            margin-left: 15px;
-        }
+#idleUI{margin-top:25px;}
+#score{color:#aaa;font-size:18px;}
+#mult{color:#666;font-size:12px;margin-top:5px;}
 
-        .date {
-            font-size: 32px;
-            color: #cccccc;
-            text-shadow: 
-                0 0 5px rgba(204, 204, 204, 0.5);
-            letter-spacing: 4px;
-            margin-bottom: 10px;
-        }
+#barWrap{
+    height:6px;
+    width:140px;
+    background:rgba(255,255,255,0.1);
+    margin:15px auto 0;
+    border-radius:999px;
+    overflow:hidden;
+}
 
-        .day {
-            font-size: 24px;
-            color: #999999;
-            text-shadow: 
-                0 0 5px rgba(153, 153, 153, 0.5);
-            letter-spacing: 3px;
-        }
+#bar{
+    height:100%;
+    width:0%;
+    background:#fff;
+    border-radius:999px;
+}
 
-        .blink {
-            animation: blink 1s step-end infinite;
-        }
+.paddle{
+    position:absolute;
+    width:10px;
+    height:90px;
+    background:#fff;
+    border-radius:999px;
+    display:none;
+}
 
-        @keyframes blink {
-            0%, 50% {
-                opacity: 1;
-            }
-            51%, 100% {
-                opacity: 0.3;
-            }
-        }
+#player{left:20px;top:50%;}
+#bot{right:20px;top:50%;}
 
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
+#ball{
+    position:absolute;
+    width:10px;
+    height:10px;
+    background:#fff;
+    border-radius:50%;
+    display:none;
+}
 
-        .particle {
-            position: absolute;
-            background: #ffffff;
-            border-radius: 50%;
-            opacity: 0;
-            animation: particle-float 8s linear infinite;
-        }
-
-        @keyframes particle-float {
-            0% {
-                opacity: 0;
-                transform: translateY(0) scale(0);
-            }
-            10% {
-                opacity: 0.5;
-            }
-            90% {
-                opacity: 0.5;
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-100vh) scale(1);
-            }
-        }
-
-        .analog-clock {
-            width: 300px;
-            height: 300px;
-            position: relative;
-            margin: 0 auto 40px;
-        }
-
-        .clock-face {
-            width: 100%;
-            height: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            position: relative;
-            box-shadow: 
-                0 0 20px rgba(255, 255, 255, 0.2),
-                inset 0 0 20px rgba(255, 255, 255, 0.05);
-        }
-
-        body.light-mode .clock-face {
-            border-color: rgba(0, 0, 0, 0.2);
-            box-shadow: 
-                0 0 20px rgba(0, 0, 0, 0.1),
-                inset 0 0 20px rgba(0, 0, 0, 0.03);
-        }
-
-        .analog-clock .hand {
-            position: absolute;
-            bottom: 50%;
-            left: 50%;
-            transform-origin: bottom center;
-            background: #ffffff;
-            border-radius: 10px;
-        }
-
-        body.light-mode .analog-clock .hand {
-            background: #000000;
-        }
-
-        .analog-clock .hour-hand {
-            width: 6px;
-            height: 80px;
-            margin-left: -3px;
-        }
-
-        .analog-clock .minute-hand {
-            width: 4px;
-            height: 110px;
-            margin-left: -2px;
-        }
-
-        .analog-clock .second-hand {
-            width: 2px;
-            height: 120px;
-            margin-left: -1px;
-            background: #ff4444;
-        }
-
-        body.light-mode .analog-clock .second-hand {
-            background: #ff4444;
-        }
-
-        .analog-clock .center-dot {
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            background: #ffffff;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-        }
-
-        body.light-mode .analog-clock .center-dot {
-            background: #000000;
-        }
-
-        .analog-clock .hour-marker {
-            position: absolute;
-            width: 3px;
-            height: 18px;
-            background: #ffffff;
-            left: 50%;
-            top: 0;
-            margin-left: -1.5px;
-            margin-top: 8px;
-            transform-origin: 1.5px calc(150px - 8px);
-        }
-
-        body.light-mode .analog-clock .hour-marker {
-            background: #000000;
-        }
-
-        .clock-display {
-            display: none;
-        }
-
-        .clock-display.active {
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            .time {
-                font-size: 60px;
-                letter-spacing: 5px;
-            }
-            .date {
-                font-size: 18px;
-                letter-spacing: 2px;
-            }
-            .day {
-                font-size: 14px;
-                letter-spacing: 2px;
-            }
-            .ampm {
-                font-size: 24px;
-                margin-left: 8px;
-            }
-            .analog-clock {
-                width: 220px;
-                height: 220px;
-                margin-bottom: 30px;
-            }
-            .analog-clock .hour-hand {
-                width: 5px;
-                height: 60px;
-                margin-left: -2.5px;
-            }
-            .analog-clock .minute-hand {
-                width: 3px;
-                height: 80px;
-                margin-left: -1.5px;
-            }
-            .analog-clock .second-hand {
-                width: 2px;
-                height: 90px;
-                margin-left: -1px;
-            }
-            .analog-clock .hour-marker {
-                height: 14px;
-                margin-top: 6px;
-                transform-origin: 1.5px calc(110px - 6px);
-            }
-            .controls {
-                bottom: 15px;
-                right: 15px;
-                gap: 6px;
-                flex-wrap: wrap;
-                max-width: calc(100vw - 30px);
-            }
-            .controls button {
-                padding: 8px 12px;
-                font-size: 11px;
-            }
-        }
-
-        .controls {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            display: flex;
-            gap: 10px;
-            opacity: 1;
-            transition: opacity 0.3s ease;
-            pointer-events: auto;
-        }
-
-        .controls.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .controls button {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: #ffffff;
-            padding: 10px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .controls button:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .controls button:active {
-            transform: translateY(0);
-        }
-    </style>
+</style>
 </head>
+
 <body>
-    <div class="particles" id="particles"></div>
-    
-    <div class="container">
-        <div class="clock-display active" id="analogClock">
-            <div class="analog-clock">
-                <div class="clock-face">
-                    <div class="hour-hand hand" id="hourHand"></div>
-                    <div class="minute-hand hand" id="minuteHand"></div>
-                    <div class="second-hand hand" id="secondHand"></div>
-                    <div class="center-dot"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="clock-display active" id="digitalClock">
-            <div class="time" id="time">00:00:00</div>
-            <div class="date" id="date">01 JANVIER 2024</div>
-            <div class="day" id="day">LUNDI</div>
+
+<div id="screen">
+
+<div class="container">
+
+    <div class="rebirth" id="rebirth"></div>
+    <div class="level" id="level">NIVEAU 0</div>
+
+    <div class="time" id="time">00:00:00</div>
+    <div class="date" id="date"></div>
+    <div class="day" id="day"></div>
+
+    <div id="idleUI">
+        <div id="score">Score: 0</div>
+        <div id="mult">Multiplier: x1.00</div>
+
+        <div id="barWrap">
+            <div id="bar"></div>
         </div>
     </div>
 
-    <div class="controls" id="controls">
-        <button id="clockTypeBtn">⏱️</button>
-        <button id="formatBtn">12H</button>
-        <button id="langBtn">EN</button>
-        <button id="themeBtn">☀️</button>
-    </div>
+</div>
 
-    <script>
-        let is24Hour = true;
-        let isFrench = true;
-        let isDarkMode = true;
-        let clockType = 'both'; // 'analog', 'digital', 'both'
-        let mouseTimeout;
+<div class="paddle" id="player"></div>
+<div class="paddle" id="bot"></div>
+<div id="ball"></div>
 
-        const controls = document.getElementById('controls');
-        const formatBtn = document.getElementById('formatBtn');
-        const langBtn = document.getElementById('langBtn');
-        const themeBtn = document.getElementById('themeBtn');
-        const clockTypeBtn = document.getElementById('clockTypeBtn');
-        const analogClock = document.getElementById('analogClock');
-        const digitalClock = document.getElementById('digitalClock');
+</div>
 
-        // Créer les marqueurs d'heures
-        const clockFace = document.querySelector('.clock-face');
-        for (let i = 0; i < 12; i++) {
-            const marker = document.createElement('div');
-            marker.className = 'hour-marker';
-            marker.style.transform = `rotate(${i * 30}deg)`;
-            clockFace.appendChild(marker);
+<script>
+
+function clock(){
+    const n=new Date();
+
+    document.getElementById("time").textContent=
+        String(n.getHours()).padStart(2,'0')+":"+
+        String(n.getMinutes()).padStart(2,'0')+":"+
+        String(n.getSeconds()).padStart(2,'0');
+
+    const days=["DIM","LUN","MAR","MER","JEU","VEN","SAM"];
+    document.getElementById("day").textContent=days[n.getDay()];
+
+    document.getElementById("date").textContent=
+        n.getDate()+"/"+(n.getMonth()+1)+"/"+n.getFullYear();
+}
+setInterval(clock,1000);
+clock();
+
+let level=0;
+let rebirth=0;
+let score=0;
+let progress=0;
+let last=performance.now();
+
+function need(l){ return 10*Math.pow(1.35,l); }
+
+function bg(l){
+    if(l<15) return "#000";
+    let r=Math.min(255,80+(l-15)*10);
+    return `rgb(${r},0,0)`;
+}
+
+function updateUI(){
+    document.getElementById("level").textContent="NIVEAU "+level;
+    document.getElementById("rebirth").textContent=
+        rebirth>0 ? "REBIRTH x"+rebirth : "";
+}
+
+function rebirthNow(){
+    rebirth++;
+    level=0;
+    progress=0;
+    score=0;
+}
+
+let pong=false;
+let afk=0;
+
+const player=document.getElementById("player");
+const bot=document.getElementById("bot");
+const ball=document.getElementById("ball");
+
+let py=0;
+let by=0;
+
+let bx=window.innerWidth/2;
+let by2=window.innerHeight/2;
+
+let vx=420;
+let vy=260;
+
+function enablePong(){
+    if(pong) return;
+    pong=true;
+    player.style.display="block";
+    bot.style.display="block";
+    ball.style.display="block";
+}
+
+function disablePong(){
+    pong=false;
+    player.style.display="none";
+    bot.style.display="none";
+    ball.style.display="none";
+}
+
+document.addEventListener("keydown",(e)=>{
+    afk=0;
+
+    if(e.key==="ArrowUp"||e.key==="ArrowDown") enablePong();
+
+    if(e.key==="ArrowUp") py-=35;
+    if(e.key==="ArrowDown") py+=35;
+});
+
+function loop(now){
+
+    let dt=(now-last)/1000;
+    last=now;
+
+    afk+=dt;
+    if(afk>9) disablePong();
+
+    let speed=1+level*0.25;
+
+    score+=speed*dt;
+    progress+=speed*dt;
+
+    let needV=need(level);
+
+    let p=progress/needV;
+    document.getElementById("bar").style.width=Math.min(p,1)*100+"%";
+
+    while(progress>=needV){
+        level++;
+        progress-=needV;
+        document.body.style.background=bg(level);
+
+        if(level>=1000 && confirm("REBIRTH ?")){
+            rebirthNow();
         }
 
-        function showControls() {
-            controls.classList.remove('hidden');
-            document.body.style.cursor = 'default';
-            clearTimeout(mouseTimeout);
-            mouseTimeout = setTimeout(() => {
-                controls.classList.add('hidden');
-                document.body.style.cursor = 'none';
-            }, 2500);
+        needV=need(level);
+    }
+
+    updateUI();
+
+    document.getElementById("score").textContent="Score: "+Math.floor(score);
+    document.getElementById("mult").textContent="Multiplier: x"+speed.toFixed(2);
+
+    if(pong){
+
+        const w=window.innerWidth;
+        const h=window.innerHeight;
+
+        py = Math.max(-h/2+60, Math.min(h/2-60, py));
+        player.style.top=(h/2+py)+"px";
+
+        let target=(by2 - h/2);
+        by += (target - by) * 0.12;
+        bot.style.top=(h/2+by)+"px";
+
+        bx += vx*dt;
+        by2 += vy*dt;
+
+        if(by2<0){by2=0;vy*=-1;}
+        if(by2>h){by2=h;vy*=-1;}
+
+        if (
+            bx < 40 &&
+            by2 > h/2 + py - 60 &&
+            by2 < h/2 + py + 60 &&
+            vx < 0
+        ){
+            vx = Math.abs(vx);
+            score += 5;
         }
 
-        document.addEventListener('mousemove', showControls);
-
-        formatBtn.addEventListener('click', () => {
-            is24Hour = !is24Hour;
-            formatBtn.textContent = is24Hour ? '12H' : '24H';
-            updateClock();
-        });
-
-        langBtn.addEventListener('click', () => {
-            isFrench = !isFrench;
-            langBtn.textContent = isFrench ? 'EN' : 'FR';
-            updateClock();
-        });
-
-        themeBtn.addEventListener('click', () => {
-            isDarkMode = !isDarkMode;
-            document.body.classList.toggle('light-mode');
-            themeBtn.textContent = isDarkMode ? '☀️' : '🌙';
-        });
-
-        clockTypeBtn.addEventListener('click', () => {
-            if (clockType === 'both') {
-                clockType = 'digital';
-                clockTypeBtn.textContent = '🕐';
-                analogClock.classList.remove('active');
-                digitalClock.classList.add('active');
-            } else if (clockType === 'digital') {
-                clockType = 'analog';
-                clockTypeBtn.textContent = '🔢';
-                analogClock.classList.add('active');
-                digitalClock.classList.remove('active');
-            } else {
-                clockType = 'both';
-                clockTypeBtn.textContent = '⏱️';
-                analogClock.classList.add('active');
-                digitalClock.classList.add('active');
-            }
-        });
-
-        function updateAnalogClock() {
-            const now = new Date();
-            const hours = now.getHours() % 12;
-            const minutes = now.getMinutes();
-            const seconds = now.getSeconds();
-
-            const hourDeg = (hours * 30) + (minutes * 0.5);
-            const minuteDeg = minutes * 6;
-            const secondDeg = seconds * 6;
-
-            document.getElementById('hourHand').style.transform = `rotate(${hourDeg}deg)`;
-            document.getElementById('minuteHand').style.transform = `rotate(${minuteDeg}deg)`;
-            document.getElementById('secondHand').style.transform = `rotate(${secondDeg}deg)`;
+        if(
+            bx>w-40 &&
+            by2>h/2+by-60 &&
+            by2<h/2+by+60
+        ){
+            vx=-Math.abs(vx);
         }
 
-        function updateClock() {
-            const now = new Date();
-            
-            let hours = now.getHours();
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            if (!is24Hour) {
-                const ampm = hours >= 12 ? ' PM' : ' AM';
-                hours = hours % 12 || 12;
-                document.getElementById('time').innerHTML = 
-                    `${String(hours).padStart(2, '0')}<span class="blink">:</span>${minutes}<span class="blink">:</span>${seconds}<span class="ampm">${ampm}</span>`;
-            } else {
-                document.getElementById('time').innerHTML = 
-                    `${String(hours).padStart(2, '0')}<span class="blink">:</span>${minutes}<span class="blink">:</span>${seconds}`;
-            }
-            
-            const daysFr = ['DIMANCHE', 'LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI'];
-            const daysEn = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-            const monthsFr = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 
-                          'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
-            const monthsEn = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE',
-                          'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
-            
-            const days = isFrench ? daysFr : daysEn;
-            const months = isFrench ? monthsFr : monthsEn;
-            
-            const day = String(now.getDate()).padStart(2, '0');
-            const month = months[now.getMonth()];
-            const year = now.getFullYear();
-            const dayName = days[now.getDay()];
-            
-            if (isFrench) {
-                document.getElementById('date').textContent = `${day} ${month} ${year}`;
-            } else {
-                document.getElementById('date').textContent = `${month} ${day}, ${year}`;
-            }
-            document.getElementById('day').textContent = dayName;
+        if(bx<0||bx>w){
+            bx=w/2;
+            by2=h/2;
+            vx*=-1;
         }
 
-        function createParticle() {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            
-            const size = Math.random() * 3 + 1;
-            particle.style.width = size + 'px';
-            particle.style.height = size + 'px';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
-            particle.style.animationDelay = Math.random() * 4 + 's';
-            
-            document.getElementById('particles').appendChild(particle);
-            
-            setTimeout(() => particle.remove(), 12000);
-        }
+        ball.style.left=bx+"px";
+        ball.style.top=by2+"px";
+    }
 
-        updateClock();
-        updateAnalogClock();
-        setInterval(() => {
-            updateClock();
-            updateAnalogClock();
-        }, 1000);
-        
-        setInterval(createParticle, 300);
-        for (let i = 0; i < 20; i++) {
-            setTimeout(createParticle, Math.random() * 2000);
+    requestAnimationFrame(loop);
+}
+
+updateUI();
+requestAnimationFrame(loop);
+
+let wakeLock = null;
+
+async function keepScreenAwake() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
         }
-    </script>
+    } catch (err) {
+        console.log("Wake Lock non supporté ou refusé");
+    }
+}
+
+document.addEventListener("mousemove", keepScreenAwake);
+document.addEventListener("keydown", keepScreenAwake);
+document.addEventListener("click", keepScreenAwake);
+
+</script>
+
 </body>
 </html>
